@@ -3,14 +3,14 @@ requires = ["setuptools>=80"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-python-project"
+name = "nadra"
 version = "0.1.0"
-description = "A copy-ready Python project with agent governance and executable quality checks"
+description = "Secure, AI-driven automation architecture that integrates specialized agents for data processing, real-time monitoring, and content creation while implementing rigorous, security-by-design protocols to mitigate cyber threats."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
-authors = [{ name = "Project Contributors" }]
-keywords = ["agentic-development", "project-template", "python"]
+authors = [{ name = "Nadra Contributors" }]
+keywords = ["ai-automation", "multi-agent-systems", "security-by-design"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3",
@@ -32,12 +32,12 @@ dev = [
 ]
 
 [project.scripts]
-agent-py = "agent_py.cli:main"
-agent-py-plan = "agent_py.quality.plan_summary:main"
+nadra = "nadra.cli:main"
+nadra-plan = "nadra.quality.plan_summary:main"
 
 [project.urls]
-Documentation = "https://example.com/agent-python-project/docs"
-Repository = "https://example.com/agent-python-project"
+Documentation = "https://github.com/volod/nadra/tree/main/docs"
+Repository = "https://github.com/volod/nadra"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -51,7 +51,7 @@ select = ["E4", "E7", "E9", "F", "I", "B", "UP", "SIM", "RUF"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["src/agent_py"]
+files = ["src/nadra"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_untyped_defs = true
@@ -68,7 +68,7 @@ addopts = "-q"
 
 [tool.coverage.run]
 branch = true
-source = ["agent_py"]
+source = ["nadra"]
 
 [tool.coverage.report]
 fail_under = 90

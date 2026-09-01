@@ -1,16 +1,18 @@
-# Agent Python Project Specification
+# Nadra Specification
 
 ## Purpose
 
-The project provides a small, production-shaped Python base that a team can copy and immediately
-develop with human and coding-agent contributors. It makes product intent, forward work, current
-behavior, and quality gates explicit enough that a fresh contributor can select and complete work
-without reconstructing unwritten process.
+Nadra is a secure, AI-driven automation architecture that integrates specialized agents for data
+processing, real-time monitoring, and content creation while implementing rigorous,
+security-by-design protocols to mitigate cyber threats.
 
-The specification is living. A product need discovered during implementation expands this document
-through [Extending This Specification](#extending-this-specification). It is not a fixed scope
-fence, but behavior that has no specification, boundary, or evaluation is outside the product until
-those are declared.
+This specification is living. Nadra's complete domain design will be supplied later. Until then,
+the repository specifies only its development foundation and project identity; intended domain
+areas are not treated as available capabilities or implementation-ready requirements.
+
+A product need discovered during implementation expands this document through
+[Extending This Specification](#extending-this-specification). Behavior that has no specification,
+boundary, or evaluation remains outside the product until those are declared.
 
 ## Design principles
 
@@ -24,36 +26,44 @@ domain problem -> bounded capability -> evaluation -> forward task
 The product specification answers what and why. The plan answers what remains. Current-state pages
 answer what exists. CI checks the joins so completion is a state transition, not a status note.
 
+Security-sensitive behavior must be specified with explicit trust boundaries, failure handling,
+and acceptance signals before implementation. The high-level security-by-design direction does not
+substitute for those capability-level contracts.
+
 ## Scope
 
-The starter repository includes:
+The current Nadra foundation includes:
 
-- a Python 3.12+ `src` layout with an importable package and CLI;
+- a Python 3.12+ `src` layout with an importable `nadra` package and CLI;
 - locked `uv` dependency management and Make entrypoints;
 - deterministic tests, formatting, linting, typing, coverage, complexity, shell, and docs checks;
 - GitHub Actions using the same CI entrypoint as local development;
 - shared instructions for Codex, Claude, Gemini, and Cursor;
 - a living capability registry and forward-plan/current-state lifecycle.
 
-The starter does not choose a business domain, application framework, persistence layer, deployment
-platform, or release policy. Those are product decisions and must enter through a specified
-capability when needed. The example identity command proves packaging and execution only; it is not
-an application architecture recommendation.
+Nadra's stated direction includes specialized agents for data processing, real-time monitoring, and
+content creation within a security-by-design architecture. The current specification does not yet
+choose agent responsibilities, orchestration, data contracts, models, interfaces, persistence,
+deployment, threat controls, or operational acceptance criteria. Those decisions require the full
+design and must enter through specified capabilities before product code or plan tasks are added.
 
 ## Architecture
+
+The architecture currently implemented is the project foundation:
 
 ```text
 Make and GitHub Actions
         |
-        +-> package and CLI under src/agent_py/
+        +-> package and CLI under src/nadra/
         +-> mirrored tests under tests/
-        +-> quality checks under src/agent_py/quality/
+        +-> quality checks under src/nadra/quality/
         `-> design -> plan -> current documentation lifecycle
 ```
 
-Production behavior belongs below `src/agent_py/`. CLI parsing stays at the boundary and domain
-logic moves to focused modules. Runtime artifacts resolve from `DATA_DIR` and never enter source
-packages.
+Production behavior belongs below `src/nadra/`. CLI parsing stays at the boundary and domain logic
+moves to focused modules. Runtime artifacts resolve from `DATA_DIR` and never enter source packages.
+The eventual domain architecture remains intentionally unspecified until the full design is
+provided.
 
 ## Reproducible environment
 
@@ -62,25 +72,25 @@ GitHub Actions both call Make targets and use the same locked development extra.
 `DATA_DIR`; the shared environment helper chooses `UV_LINK_MODE=copy` only when uv's cache and the
 checkout live on different filesystems.
 
-Boundary: the skeleton controls Python dependencies and checks. It does not install system packages,
-provision external services, or guarantee reproducibility for undeclared tools.
+Boundary: the repository controls Python dependencies and checks. It does not install system
+packages, provision external services, or guarantee reproducibility for undeclared tools.
 
-Evaluation: a fresh copy reaches `make bootstrap` and `make ci` without manual repair. A negative
-result names the missing command, stale lock, unsupported interpreter, or failing gate rather than
-silently changing the environment contract.
+Evaluation: a fresh checkout reaches `make bootstrap` and `make ci` without manual repair. A
+negative result names the missing command, stale lock, unsupported interpreter, or failing gate
+rather than silently changing the environment contract.
 
 ## Project identity
 
-The package exposes typed distribution, import-package, and version metadata. The `agent-py info`
-command provides a minimal installed-path smoke test and a stable seam for replacing the starter
-identity with the real product's first interface.
+The `nadra` package exposes typed distribution, import-package, and version metadata. The
+`nadra info` command provides a minimal installed-path smoke test and a stable seam for Nadra's
+future product interfaces.
 
 Boundary: the command reports identity only. It does not define configuration, service health,
-deployment readiness, or product-domain behavior.
+deployment readiness, security posture, or product-domain behavior.
 
-Evaluation: package import and CLI tests verify the same identity, while the build target produces
-both source and wheel distributions. A negative result retains the minimal identity seam and records
-why the proposed product interface is not yet ready.
+Evaluation: package import and CLI tests verify the `nadra` identity, while the build target
+produces both source and wheel distributions. A negative result retains the minimal identity seam
+and records why a proposed product interface is not ready.
 
 ## Documentation and planning integrity
 
@@ -94,8 +104,8 @@ valuable, whether an evaluation threshold is ambitious enough, or whether a huma
 correct.
 
 Evaluation: synthetic tests reproduce broken links, unknown capabilities, missing task fields,
-wrong task lanes, and invalid ordering; the shipped tree passes the same checks. A negative result
-blocks the change and points to the documents that disagree.
+wrong task lanes, and invalid ordering; the repository tree passes the same checks. A negative
+result blocks the change and points to the documents that disagree.
 
 ## Capability Registry
 
@@ -110,7 +120,7 @@ upstream before downstream.
 | # | Capability | Status | How it is evaluated | Implementation |
 | --- | --- | --- | --- | --- |
 | 1 | `reproducible-environment` | shipped | A fresh locked environment reaches the complete CI gate without manual repair | [Developer tooling](../impl/current/developer-tooling.md) |
-| 2 | `project-identity` | shipped | Import, CLI, and distribution-build tests agree on the starter identity | [Product core](../impl/current/product-core.md) |
+| 2 | `project-identity` | shipped | Import, CLI, and distribution-build tests agree on the Nadra identity | [Product core](../impl/current/product-core.md) |
 | 3 | `documentation-integrity` | shipped | Link, registry-plan, task-lane, metadata, ordering, and forward-language checks pass over fixtures and the repository tree | [Governance](../impl/current/governance.md) |
 
 ## Extending This Specification
@@ -148,7 +158,11 @@ not by adding heuristics to the checker.
 
 ## Success criteria
 
-The skeleton succeeds when a team can copy it, rename it, create a locked environment, run a tested
-package, and use any supported agent without duplicating project policy. A maintainer can determine
-what the product promises, what work remains, which task is next in each lane, what behavior exists,
-and how every capability is evaluated from repository files alone.
+The current foundation succeeds when contributors can create the locked environment, import and run
+the Nadra package, execute the complete quality gate, and use supported coding agents without
+duplicating project policy. A maintainer can determine what Nadra currently promises, what work
+remains, which task is next in each lane, what behavior exists, and how every registered capability
+is evaluated from repository files alone.
+
+Future product success criteria will be added with the full design and its capability-level
+evaluations; this foundation does not infer them from the project description.
