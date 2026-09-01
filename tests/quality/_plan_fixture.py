@@ -11,6 +11,16 @@ SPEC = """# Design
 """
 
 
+SHIPPED_SPEC = """# Design
+
+## Capability Registry
+
+| # | Capability | Status | How it is evaluated | Implementation |
+| --- | --- | --- | --- | --- |
+| 1 | `foundation` | shipped | Fresh setup passes | [Foundation](../impl/current.md) |
+"""
+
+
 def task_block(
     identifier: str = "build-feature",
     *,

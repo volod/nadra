@@ -42,10 +42,15 @@ The current Nadra foundation includes:
 - a living capability registry and forward-plan/current-state lifecycle.
 
 Nadra's stated direction includes specialized agents for data processing, real-time monitoring, and
-content creation within a security-by-design architecture. The current specification does not yet
-choose agent responsibilities, orchestration, data contracts, models, interfaces, persistence,
-deployment, threat controls, or operational acceptance criteria. Those decisions require the full
-design and must enter through specified capabilities before product code or plan tasks are added.
+content creation within a security-by-design architecture. The first two product capabilities are
+specified below: an [acquisition ontology](#acquisition-ontology) that gives every consumer one
+shared model to interface with, and [evidence acquisition](#evidence-acquisition), which covers
+capture, provenance, and the trust boundary at which external text enters the system.
+
+The rest of that direction remains unspecified. Orchestration, models, interfaces, persistence,
+deployment, and operational acceptance for the analysis, monitoring, and content areas are not
+chosen here, and must enter through their own specified capabilities before product code or plan
+tasks are added.
 
 ## Architecture
 
@@ -107,6 +112,96 @@ Evaluation: synthetic tests reproduce broken links, unknown capabilities, missin
 wrong task lanes, and invalid ordering; the repository tree passes the same checks. A negative
 result blocks the change and points to the documents that disagree.
 
+## Acquisition ontology
+
+Consumers of acquired evidence interface with a defined object model of the acquisition domain
+rather than with Nadra's storage, its code, or one another's schemas. Without it, each consumer
+needs a bespoke export and every change to one of them is a change to Nadra.
+
+The model has three parts. **Objects** are the domain's nouns: source, determination, acquisition
+run, capture, derivation, document, span, and operator. **Links** are the defined relationships
+between them, which make the model traversable rather than a bag of records. **Actions** are the
+only way state changes; each declares its typed parameters, the submission criteria evaluated
+against object state before it may run, the exact objects and links it edits, and the single
+component permitted to execute it.
+
+The upper vocabulary is the W3C provenance ontology, whose entity, activity, and agent classes and
+derivation, generation, revision, and attribution properties already describe what acquisition
+produces. Adopting a published vocabulary rather than inventing one keeps the model interpretable
+outside this repository.
+
+Two properties follow from the object model and are load-bearing elsewhere. Objects are append-only:
+a changed upstream produces a new document linked as a revision rather than a rewrite, because
+downstream labels are character offsets into document text and a rewrite would silently invalidate
+them. And no action grants both network access and the parsing of untrusted content, which is where
+the security boundary is enforced rather than described.
+
+A consumer is served by a projection, which renders objects into the shape that consumer already
+reads. Adding a consumer adds a projection.
+
+**Boundary.** The ontology describes the provenance of acquisition in a closed vocabulary. It is not
+an analysis graph over people, companies, or events named inside acquired documents, and Nadra
+resolves no such entities. It is not a query engine, a triplestore, or a graph database. It does not
+model anything downstream of the handoff.
+
+**Evaluation.** The capability is known to work when all of the following hold:
+
+- every object validates against its typed schema and every link is one of the defined relations;
+- every state change passes through an action, shown by a check that fails when an object is written
+  directly;
+- two distinct projections are rendered from the same objects, and adding the second required no
+  change to any object, link, or action;
+- the model serializes to the published provenance vocabulary and reads back with its links intact.
+
+**Valid negative result.** The second projection cannot be added without changing an object, a link,
+or an action. That outcome means the model is a rename of one consumer's schema rather than a model
+of the domain, and it returns the capability to specification. It is the cheapest informative failure
+available and is reached early by design.
+
+## Evidence acquisition
+
+Nadra acquires external sources into an immutable capture store and derives documents published
+through the [acquisition ontology](#acquisition-ontology). Acquisition is the point at which text an
+attacker may control enters the system, so this capability owns the trust boundary as well as the
+transfer.
+
+The capability has three parts:
+
+- **Capture.** An egress component holds credentials, fetches, and writes WARC records carrying
+  target URI, capture date, and payload digest, together with an index over them. It does not parse
+  captured content.
+- **Derivation.** A reader component with no network capability reads the capture store and emits
+  normalized document text plus a per-document metadata sidecar. Normalized text is immutable once
+  emitted; a changed upstream yields a new document identity rather than a rewrite, because
+  downstream labels are character offsets into that text.
+- **Handoff.** The derived corpus directory is consumed by a downstream corpus consumer without
+  hand-editing.
+
+The split between capture and derivation is a security requirement, not an implementation
+preference. The component that reads untrusted text has no network access, and the component with
+network access never parses untrusted text. This is the structural defence against instructions
+hidden inside an acquired document, and no guardrail substitutes for it.
+
+**Boundary.** This capability does not train, tune, score, or serve models. It does not chunk,
+retrieve, lemmatize, resolve entities, or build graphs. It does not generate, synthesize, or
+publish, and it holds none of the credentials those need. It does not redistribute captured
+sources. It does not schedule recurring acquisition; recurrence is a later capability.
+
+**Evaluation.** The capability is known to work when all of the following hold:
+
+- downstream corpus ingest completes with every document reported ok and no hand-editing;
+- a provenance round trip succeeds ten times out of ten: ten documents sampled from the ingested
+  corpus each resolve, offline and without network access, from the corpus document back through
+  the capture store to the capture that produced it;
+- an injection canary planted in a captured document reaches no component holding credentials,
+  shown by a test that fails when the property is violated;
+- re-deriving from one capture yields byte-identical text and the same document identity.
+
+**Valid negative result.** Either the reader cannot be isolated from the network on the target
+platform at acceptable operational cost, or derived text cannot be made reproducible from a
+capture. Either outcome returns the capability to specification rather than being worked around,
+and is recorded as a negative result rather than a failure.
+
 ## Capability Registry
 
 Every product capability appears here exactly once. Status is `planned` when the capability is
@@ -122,6 +217,8 @@ upstream before downstream.
 | 1 | `reproducible-environment` | shipped | A fresh locked environment reaches the complete CI gate without manual repair | [Developer tooling](../impl/current/developer-tooling.md) |
 | 2 | `project-identity` | shipped | Import, CLI, and distribution-build tests agree on the Nadra identity | [Product core](../impl/current/product-core.md) |
 | 3 | `documentation-integrity` | shipped | Link, registry-plan, task-lane, metadata, ordering, and forward-language checks pass over fixtures and the repository tree | [Governance](../impl/current/governance.md) |
+| 4 | `acquisition-ontology` | planned | Every object validates against its typed schema and every link is a defined relation; a direct object write fails; two projections render from the same objects and the second required no change to any object, link, or action; the model round-trips through the published provenance vocabulary | [Forward plan](../impl/plan.md) |
+| 5 | `evidence-acquisition` | planned | Downstream corpus ingest completes with no hand-editing; a ten-of-ten offline provenance round trip from document to capture; a planted injection canary reaches no credential-holding component; re-derivation from one capture is byte-identical | [Forward plan](../impl/plan.md) |
 
 ## Extending This Specification
 
