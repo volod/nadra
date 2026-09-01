@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from agent_py.quality.plan_summary import main, summary_lines
+from nadra.quality.plan_summary import main, summary_lines
 from tests.quality._plan_fixture import plan_with, task_block, write_project
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

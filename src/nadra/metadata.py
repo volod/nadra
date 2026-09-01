@@ -1,10 +1,10 @@
-"""Stable project identity used by the starter API and CLI."""
+"""Stable Nadra identity used by the public API and CLI."""
 
 from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
 
-DISTRIBUTION_NAME = "agent-python-project"
-PACKAGE_NAME = "agent_py"
+DISTRIBUTION_NAME = "nadra"
+PACKAGE_NAME = "nadra"
 FALLBACK_VERSION = "0.0.0+uninstalled"
 
 

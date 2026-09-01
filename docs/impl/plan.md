@@ -1,4 +1,4 @@
-# Agent Python Project Implementation Plan
+# Nadra Implementation Plan
 
 Forward-only: this file describes work that remains. Available behavior and durable results belong
 in [current-state documentation](current.md). Product behavior and evaluation belong in the
